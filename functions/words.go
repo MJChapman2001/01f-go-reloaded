@@ -11,5 +11,5 @@ func Low(s string) string {
 }
 
 func Cap(s string) string {
-	return strings.Title(s)
+	return strings.Title(Low(s))
 }
