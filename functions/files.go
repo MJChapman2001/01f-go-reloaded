@@ -8,15 +8,8 @@ import (
 	"strconv"
 )
 
-func ProcessFile(s string, fileName string) {
-	newContent := ""
-
-	content, err := ioutil.ReadFile(s)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	contentSlice := strings.Fields(string(content))
+func Commands(s string) string {
+	contentSlice := strings.Fields(s)
 
 	for i, j := range contentSlice {
 		switch j {
@@ -71,12 +64,17 @@ func ProcessFile(s string, fileName string) {
 		}
 	}
 
-	newContent = strings.Join(contentSlice, " ")
+	newContent := strings.Join(contentSlice, " ")
 
-	contentSlice = strings.Fields(newContent)
+	return newContent
+}
+
+func Punctuation(s string) string {
+	contentSlice := strings.Fields(s)
 
 	for k, l := range contentSlice {
 		splitL := []rune(l)
+
 		switch splitL[0] {
 		case '.':
 			temp := 1
@@ -138,33 +136,84 @@ func ProcessFile(s string, fileName string) {
 			contentSlice[k-temp] += ":"
 			splitL[0] = ' '
 			contentSlice[k] = string(splitL)
-		case 'a':
-			vowels := []rune{'a', 'e', 'i', 'o', 'u', 'h', 'A', 'E', 'I', 'O', 'U', 'H'}
+		}
+	}
 
-			nextSlice := []rune(contentSlice[k+1])
+	newContent := strings.Join(contentSlice, " ")
 
-			for _, x := range vowels {
-				if x == nextSlice[0] {
-					contentSlice[k] += "n"
-				}
-			}
-		case 'A':
-			vowels := []rune{'a', 'e', 'i', 'o', 'u', 'h', 'A', 'E', 'I', 'O', 'U', 'H'}
+	return newContent
+}
 
-			nextSlice := []rune(contentSlice[k+1])
+func LetterA(s string) string {
+	contentSlice := strings.Fields(s)
 
-			for _, x := range vowels {
-				if x == nextSlice[0] {
-					contentSlice[k] += "n"
+	vowels := []rune{'a', 'e', 'i', 'o', 'u', 'h', 'A', 'E', 'I', 'O', 'U', 'H'}
+	
+	for m := 0; m < len(contentSlice)-1; m++ {
+		if contentSlice[m] == "a" || contentSlice[m] == "A" {
+			tempSlice := []rune(contentSlice[m+1])
+
+			for _, n := range vowels {
+				if tempSlice[0] == n {
+					contentSlice[m] += "n"
 				}
 			}
 		}
 	}
 
-	newContent = strings.Join(contentSlice, " ")
+	newContent := strings.Join(contentSlice, " ")
 
-	contentSlice = strings.Fields(newContent)
-	newContent = strings.Join(contentSlice, " ")
+	return newContent
+}
 
-	os.WriteFile(fileName, []byte(newContent), 0666)
+func Quote(s string) string {
+	contentSlice := strings.Fields(s)
+	quoteCount := 1
+
+	for index, data := range contentSlice {
+		if data == "'" {
+			if quoteCount%2 == 0 {
+				temp := 1
+
+				for contentSlice[index-temp] == "" {
+					temp++
+				}
+
+				contentSlice[index-temp] += "'"
+				contentSlice[index] = ""
+			} else {
+				if index+1 < len(contentSlice)-1 {
+					contentSlice[index+1] = "'" + contentSlice[index+1]
+					contentSlice[index] = ""
+				}
+			}
+
+			quoteCount++
+		}
+	}
+
+	newContent := strings.Join(contentSlice, " ")
+
+	return newContent
+}
+
+func ProcessFile(s string, fileName string) {
+
+	content, err := ioutil.ReadFile(s)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	data := string(content)
+
+	data = Commands(data)
+	data = Punctuation(data)
+	data = LetterA(data)
+	data = Quote(data)
+
+	temp := strings.Fields(data)
+
+	data = strings.Join(temp, " ")
+
+	os.WriteFile(fileName, []byte(data), 0666)
 }
