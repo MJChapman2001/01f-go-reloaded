@@ -65,6 +65,8 @@ func Commands(s string) string {
 	}
 
 	newContent := strings.Join(contentSlice, " ")
+	contentSlice = strings.Fields(newContent)
+	newContent = strings.Join(contentSlice, " ")
 
 	return newContent
 }
@@ -140,6 +142,8 @@ func Punctuation(s string) string {
 	}
 
 	newContent := strings.Join(contentSlice, " ")
+	contentSlice = strings.Fields(newContent)
+	newContent = strings.Join(contentSlice, " ")
 
 	return newContent
 }
@@ -193,6 +197,8 @@ func Quote(s string) string {
 	}
 
 	newContent := strings.Join(contentSlice, " ")
+	contentSlice = strings.Fields(newContent)
+	newContent = strings.Join(contentSlice, " ")
 
 	return newContent
 }
@@ -210,10 +216,6 @@ func ProcessFile(s string, fileName string) {
 	data = Punctuation(data)
 	data = LetterA(data)
 	data = Quote(data)
-
-	temp := strings.Fields(data)
-
-	data = strings.Join(temp, " ")
 
 	os.WriteFile(fileName, []byte(data), 0666)
 }
